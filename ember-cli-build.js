@@ -6,6 +6,10 @@ var transpileES6 = require('emberjs-build/lib/utils/transpile-es6');
 var handlebarsInlinedTrees = require('./build-support/handlebars-inliner');
 var getVersion = require('git-repo-version');
 var stew = require('broccoli-stew');
+var mv = stew.mv;
+var find = stew.find;
+var log = stew.log;
+var rename = stew.rename;
 
 function transpile(tree, label) {
   return transpileES6(tree, label, {
@@ -16,16 +20,11 @@ function transpile(tree, label) {
 
 module.exports = function() {
   var bower = 'bower_components';
-  var demoHTML = new Funnel('demos', {
-    include: ['*.html'],
-    destDir: '/demos'
-  });
+  var demoHTML = find('demos/*.html');
 
   var demoTS = merge([
-    new Funnel('demos', {
-      include: ['**/*.ts']
-    }),
-    stew.mv('packages/glimmer-runtime/tests/support.ts', 'glimmer-demos/index.ts')
+    find('demos/**/*.ts'),
+    mv('packages/glimmer-runtime/tests/support.ts', 'glimmer-demos/index.ts')
   ]);
 
   var demoES6 = typescript(demoTS);
@@ -33,14 +32,16 @@ module.exports = function() {
 
   var demoConcat = concat(demoES5, {
     inputFiles: ['**/*.js'],
-    outputFile: '/demos/demos.amd.js',
-    sourceMapConfig: { enabled: true }
+    outputFile: '/demos/demos.amd.js'
   });
 
   var benchmarkjs = stew.npm.main('benchmark', undefined, __dirname);
   var benchHarness = 'bench';
-  var bench = new Funnel(
-    merge([benchmarkjs, benchHarness]),
+  var bench = find(
+    merge([
+      benchmarkjs,
+      benchHarness
+    ]),
     { destDir: '/demos' }
   );
 
@@ -50,105 +51,92 @@ module.exports = function() {
     bench
   ]);
 
-  var HTMLTokenizer = new Funnel(bower+'/simple-html-tokenizer/lib/');
+  var HTMLTokenizer = new Funnel(bower + '/simple-html-tokenizer/lib/');
 
-   var DTSTree = new Funnel('packages', {
-     include: ['*/index.d.ts'],
+  var DTSTree = find('packages', {
+    include: ['*/index.d.ts'],
+    getDestinationPath: function(relativePath) {
+      return relativePath.replace(/\.d\.ts$/, '.js');
+    }
+  });
 
-      getDestinationPath: function(relativePath) {
-        return relativePath.replace(/\.d\.ts$/, '.js');
-      }
-    });
+  var tsTree = find('packages', {
+    include: ["**/*.ts"],
+    exclude: ["**/*.d.ts"]
+  });
 
-    var tsTree = new Funnel('packages', {
-      include: ["**/*.ts"],
-      exclude: ["**/*.d.ts"]
-    });
+  var jsTree = typescript(tsTree);
 
-    var jsTree = typescript(tsTree);
+  var libTree = find(jsTree, '*/lib/**/*.js');
 
-    var libTree = new Funnel(jsTree, {
-      include: ["*/lib/**/*.js"]
-    });
+  var packagesTree = merge([
+    DTSTree,
+    libTree,
+    HTMLTokenizer
+  ]);
 
-    var packagesTree = merge([
-      DTSTree,
-      libTree,
-      HTMLTokenizer
-    ]);
+  var runtimeTree = find(packagesTree, 'glimmer-runtime/**/*');
 
-    var runtimeTree = new Funnel(packagesTree, {
-      include: ['glimmer-runtime/**/*']
-    });
+  runtimeTree = merge([
+    runtimeTree,
+    handlebarsInlinedTrees.runtime
+  ]);
 
-    runtimeTree = merge([
-      runtimeTree,
-      handlebarsInlinedTrees.runtime
-    ]);
+  var compilerTree = merge([
+    packagesTree,
+    handlebarsInlinedTrees.compiler
+  ]);
 
-    var compilerTree = merge([
-      packagesTree,
-      handlebarsInlinedTrees.compiler
-    ]);
+  var testTree = find(jsTree, '*/tests/**/*.js');
 
-    var testTree = new Funnel(jsTree, {
-      include: ["*/tests/**/*.js"]
-    });
+  // Test Assets
 
-    // Test Assets
+  var testHarness = find('tests', {
+    srcDir: '/',
+    files: [ 'index.html' ],
+    destDir: '/tests'
+  });
 
-    var testHarness = new Funnel('tests', {
-      srcDir: '/',
-      files: [ 'index.html' ],
+  testHarness = merge([
+    testHarness, new Funnel(bower, {
+      srcDir: '/qunit/qunit',
       destDir: '/tests'
-    });
+    })
+  ]);
 
-    testHarness = merge([
-      testHarness, new Funnel(bower, {
-        srcDir: '/qunit/qunit',
-        destDir: '/tests'
-      })
-    ]);
+  var transpiledCompiler = transpile(compilerTree, 'transpiledLibs');
+  var transpiledRuntime = transpile(runtimeTree, 'transpiledRuntime');
+  var transpiledTests = transpile(testTree, 'transpiledTests');
 
-    var transpiledCompiler = transpile(compilerTree, 'transpiledLibs');
-    var transpiledRuntime = transpile(runtimeTree, 'transpiledRuntime');
-    var transpiledTests = transpile(testTree, 'transpiledTests');
+  var concatenatedCompiler = concat(transpiledCompiler, {
+    inputFiles: ['**/*.js'],
+    outputFile: '/amd/glimmer-compiler.amd.js'
+  });
 
-    var concatenatedCompiler = concat(transpiledCompiler, {
-      inputFiles: ['**/*.js'],
-      outputFile: '/amd/glimmer-compiler.amd.js',
-      sourceMapConfig: { enabled: true }
-    });
+  var concatenatedRuntime = concat(transpiledRuntime, {
+    inputFiles: ['**/*.js'],
+    outputFile: '/amd/glimmer-runtime.amd.js'
+  });
 
-    var concatenatedRuntime = concat(transpiledRuntime, {
-      inputFiles: ['**/*.js'],
-      outputFile: '/amd/glimmer-runtime.amd.js',
-      sourceMapConfig: { enabled: true }
-    });
+  var concatenatedTests = concat(transpiledTests, {
+    inputFiles: ['**/*.js'],
+    outputFile: '/tests.js'
+  });
 
-    var concatenatedTests = concat(transpiledTests, {
-      inputFiles: ['**/*.js'],
-      outputFile: '/tests.js',
-      sourceMapConfig: { enabled: true }
-    });
+  var loader = new Funnel(bower + '/loader.js/', {
+    files: [ 'loader.js' ],
+    destDir: '/assets'
+  });
 
-    var loader = new Funnel(bower, {
-      srcDir: '/loader.js',
-      files: [ 'loader.js' ],
-      destDir: '/assets'
-    });
+  var es6Tree = mv(packagesTree, 'es6');
 
-    var es6Tree = new Funnel(packagesTree, {
-      destDir: 'es6'
-    });
-
-    return merge([
-      es6Tree,
-      demos,
-      concatenatedCompiler,
-      concatenatedRuntime,
-      loader,
-      testHarness,
-      concatenatedTests
-    ]);
+  return merge([
+    es6Tree,
+    demos,
+    concatenatedCompiler,
+    concatenatedRuntime,
+    loader,
+    testHarness,
+    concatenatedTests
+  ]);
 }
