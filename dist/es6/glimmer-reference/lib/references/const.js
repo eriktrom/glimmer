@@ -1,0 +1,13 @@
+export class ConstReference {
+    constructor(inner) {
+        this.inner = inner;
+    }
+    // TODO: A protocol for telling Glimmer to stop asking; could also be useful
+    // for finalized references. Also, a reference composed only of const references
+    // should itself be const.
+    isDirty() { return false; }
+    value() { return this.inner; }
+    chain() { return null; }
+    destroy() { }
+}
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29uc3QuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJnbGltbWVyLXJlZmVyZW5jZS9saWIvcmVmZXJlbmNlcy9jb25zdC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQTtJQUdFLFlBQVksS0FBUTtRQUNsQixJQUFJLENBQUMsS0FBSyxHQUFHLEtBQUssQ0FBQztJQUNyQixDQUFDO0lBRUQsNEVBQTRFO0lBQzVFLGdGQUFnRjtJQUNoRiwwQkFBMEI7SUFFMUIsT0FBTyxLQUFLLE1BQU0sQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDO0lBQzNCLEtBQUssS0FBUSxNQUFNLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQUM7SUFDakMsS0FBSyxLQUFLLE1BQU0sQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDO0lBQ3hCLE9BQU8sS0FBSSxDQUFDO0FBQ2QsQ0FBQztBQUFBIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQ2hhaW5hYmxlUmVmZXJlbmNlIH0gZnJvbSAnLi4vdHlwZXMnO1xuXG5leHBvcnQgY2xhc3MgQ29uc3RSZWZlcmVuY2U8VD4gaW1wbGVtZW50cyBDaGFpbmFibGVSZWZlcmVuY2Uge1xuICBwcm90ZWN0ZWQgaW5uZXI6IFQ7XG5cbiAgY29uc3RydWN0b3IoaW5uZXI6IFQpIHtcbiAgICB0aGlzLmlubmVyID0gaW5uZXI7XG4gIH1cblxuICAvLyBUT0RPOiBBIHByb3RvY29sIGZvciB0ZWxsaW5nIEdsaW1tZXIgdG8gc3RvcCBhc2tpbmc7IGNvdWxkIGFsc28gYmUgdXNlZnVsXG4gIC8vIGZvciBmaW5hbGl6ZWQgcmVmZXJlbmNlcy4gQWxzbywgYSByZWZlcmVuY2UgY29tcG9zZWQgb25seSBvZiBjb25zdCByZWZlcmVuY2VzXG4gIC8vIHNob3VsZCBpdHNlbGYgYmUgY29uc3QuXG5cbiAgaXNEaXJ0eSgpIHsgcmV0dXJuIGZhbHNlOyB9XG4gIHZhbHVlKCk6IFQgeyByZXR1cm4gdGhpcy5pbm5lcjsgfVxuICBjaGFpbigpIHsgcmV0dXJuIG51bGw7IH1cbiAgZGVzdHJveSgpIHt9XG59XG4iXX0=

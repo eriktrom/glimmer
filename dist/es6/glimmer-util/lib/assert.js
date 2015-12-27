@@ -1,0 +1,13 @@
+let alreadyWarned = false;
+export function debugAssert(test, msg) {
+    if (!alreadyWarned) {
+        alreadyWarned = true;
+        console.log("Don't leave debug assertions on in public builds");
+    }
+    if (!test) {
+        throw new Error(msg || "assertion failure");
+    }
+}
+export function prodAssert() { }
+export default debugAssert;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXNzZXJ0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiZ2xpbW1lci11dGlsL2xpYi9hc3NlcnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsSUFBSSxhQUFhLEdBQUcsS0FBSyxDQUFDO0FBQzFCLDRCQUE0QixJQUFJLEVBQUUsR0FBRztJQUNuQyxFQUFFLENBQUMsQ0FBQyxDQUFDLGFBQWEsQ0FBQyxDQUFDLENBQUM7UUFDbkIsYUFBYSxHQUFHLElBQUksQ0FBQztRQUNyQixPQUFPLENBQUMsR0FBRyxDQUFDLGtEQUFrRCxDQUFDLENBQUM7SUFDbEUsQ0FBQztJQUVELEVBQUUsQ0FBQyxDQUFDLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQztRQUNWLE1BQU0sSUFBSSxLQUFLLENBQUMsR0FBRyxJQUFJLG1CQUFtQixDQUFDLENBQUM7SUFDOUMsQ0FBQztBQUNILENBQUM7QUFFRCwrQkFBOEIsQ0FBQztBQUUvQixlQUFlLFdBQVcsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImxldCBhbHJlYWR5V2FybmVkID0gZmFsc2U7XG5leHBvcnQgZnVuY3Rpb24gZGVidWdBc3NlcnQodGVzdCwgbXNnKSB7XG4gIGlmICghYWxyZWFkeVdhcm5lZCkge1xuICAgIGFscmVhZHlXYXJuZWQgPSB0cnVlO1xuICAgIGNvbnNvbGUubG9nKFwiRG9uJ3QgbGVhdmUgZGVidWcgYXNzZXJ0aW9ucyBvbiBpbiBwdWJsaWMgYnVpbGRzXCIpO1xuICB9XG5cbiAgaWYgKCF0ZXN0KSB7XG4gICAgdGhyb3cgbmV3IEVycm9yKG1zZyB8fCBcImFzc2VydGlvbiBmYWlsdXJlXCIpO1xuICB9XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBwcm9kQXNzZXJ0KCkge31cblxuZXhwb3J0IGRlZmF1bHQgZGVidWdBc3NlcnQ7Il19
