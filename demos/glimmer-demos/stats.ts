@@ -566,14 +566,14 @@ Stats.prototype = {
 		return b;
 	},
 
-	Σ: function() {
+	sum: function() {
 		return this.sum;
 	},
 
-	Π: function() {
+	pi: function() {
 		return this.zeroes > 0 ? 0 : Math.exp(this.sum_of_logs);
 	}
 };
 
 Stats.prototype.σ=Stats.prototype.stddev;
-Stats.prototype.μ=Stats.prototype.amean;
+Stats.prototype.amean=Stats.prototype.amean;
