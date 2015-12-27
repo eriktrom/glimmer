@@ -605,8 +605,6 @@ export class OpenElement extends StatementSyntax {
       let lookup = attributeInvocationToLookup(attrs, namedArgs);
       let template = compiler.templateFromTagContents();
       let templates = new Templates({ template, inverse: null });
-
-      debugger;
       compiler.append(new OpenComponentOpcode(component.compile(lookup, templates), namedArgs.compile(compiler)));
     } else {
       compiler.append(new OpenPrimitiveElementOpcode(this.tag));
