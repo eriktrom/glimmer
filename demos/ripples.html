@@ -99,64 +99,72 @@
         }
       });
 
-      var output = document.getElementById('output');
+      function init() {
+        var output = document.getElementById('output');
 
-      var data = {
-        width:  window.innerWidth,
-        height: window.innerHeight,
-        points: new RingBuffer(500), // in practice we only have 100-200 circles on screen
-        count:  0,
-        fps:    0
-      };
+        var data = {
+          width:  window.innerWidth,
+          height: window.innerHeight,
+          points: new RingBuffer(500), // in practice we only have 100-200 circles on screen
+          count:  0,
+          fps:    0
+        };
 
-      var result = TEMPLATES['application'].render(data, env, { appendTo: output });
+        var result = TEMPLATES['application'].render(data, env, { appendTo: output });
 
-      var touchAction = 'none';
-      var el = document.getElementById(touchAction);
+        var touchAction = 'none';
+        var el = document.getElementById(touchAction);
 
-      var mc = Hammer(el, {
-          touchAction: touchAction
-      });
-
-      mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
-
-      mc.on("tap press pan", function(e) {
-        data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
-      });
-
-      var baseOffset = Date.now() - window.performance.now();
-      var timestamp  = window.performance.now();
-
-      function tick() {
-        var _timestamp = window.performance.now()
-
-        var delta = _timestamp - timestamp;
-
-        timestamp = _timestamp;
-
-        data.fps   = (1000 / delta).toPrecision(4);
-        data.count = 0;
-
-        var walltime = baseOffset + timestamp;
-
-        data.points.forEach(function(point, i) {
-          if (point) {
-            point.update(i, walltime);
-
-            if (point.opacity > 0.001) {
-              data.count++;
-            } else {
-              data.points.remove(i);
-            }
-          }
+        var mc = Hammer(el, {
+            touchAction: touchAction
         });
 
-        result.rerender(data);
+        mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
-        window.requestAnimationFrame(tick);
+        mc.on("tap press pan", function(e) {
+          data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
+        });
+
+        var baseOffset = Date.now() - window.performance.now();
+        var timestamp  = window.performance.now();
+
+        function tick() {
+          var _timestamp = window.performance.now()
+
+          var delta = _timestamp - timestamp;
+
+          timestamp = _timestamp;
+
+          data.fps   = (1000 / delta).toPrecision(4);
+          data.count = 0;
+
+          var walltime = baseOffset + timestamp;
+
+          data.points.forEach(function(point, i) {
+            if (point) {
+              point.update(i, walltime);
+
+              if (point.opacity > 0.001) {
+                data.count++;
+              } else {
+                data.points.remove(i);
+              }
+            }
+          });
+
+          result.rerender(data);
+
+          window.requestAnimationFrame(tick);
+        }
+
+        tick();
       }
 
-      tick();
+      init();
+
+      document.addEventListener('resize', function() {
+        init();
+      });
 
     </script>
   </body>
