@@ -6,6 +6,8 @@
   "scripts": {
     "prepublish": "bower install && ember build",
     "build": "ember build",
+    "build-copy": "./node_modules/.bin/ember build && cp -rf ./bower_components/ ./dist/bower_components",
+    "watch": "nodemon --watch demos --watch bower_components --watch packages -e js,json,hbs,html,ts --exec npm run build-copy",
     "pretest": "ember build",
     "test": "ember test",
     "test:ci": "ember test --test-port=7000 --config-file=testem-sauce.json",
