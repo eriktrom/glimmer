@@ -9,7 +9,7 @@
     </style>
 
     <script data-template-name="application" type="text/x-handlebars-template">
-      <svg width="{{width}}" height="{{height}}">
+      <svg id="none" width="{{width}}" height="{{height}}">
         <rect x="0" y="0" width="{{width}}" height="{{height}}" fill="#1B1B1B" />
 
         {{#each points.items key="key" as |point|}}
@@ -25,12 +25,14 @@
 
     <div id="output"></div>
 
+    <script src="./../bower_components/hammerjs/hammer.js"></script>
     <script src="../assets/loader.js"></script>
     <script>loader.noConflict({ define: 'enifed' });</script>
     <script src="../amd/glimmer-compiler.amd.js"></script>
     <script src="./demos.amd.js"></script>
 
     <script>
+
       function RingBuffer(capacity) {
         this.capacity = capacity;
         this.head     = 0;
@@ -98,6 +100,9 @@
         }
       });
 
+      var output = document.getElementById('output');
+      output.innerHTML = null;
+
       var data = {
         width:  window.innerWidth,
         height: window.innerHeight,
@@ -106,7 +111,6 @@
         fps:    0
       };
 
-      var output = document.getElementById('output');
       var result = TEMPLATES['application'].render(data, env, { appendTo: output });
 
       window.addEventListener("resize", function() {
@@ -114,8 +118,17 @@
         data.height = window.innerHeight;
       });
 
-      document.addEventListener("mousemove", function(e) {
-        data.points.push( new Point(e.timeStamp, e.offsetX, e.offsetY) );
+      var touchAction = 'none';
+      var el = document.getElementById(touchAction);
+
+      var mc = Hammer(el, {
+        touchAction: touchAction
+      });
+
+      mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+      mc.on("tap press pan", function(e) {
+        data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
       });
 
       var baseOffset = Date.now() - window.performance.now();
@@ -151,6 +164,7 @@
       }
 
       tick();
+
     </script>
   </body>
 </html>
