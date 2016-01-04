@@ -100,9 +100,7 @@
         this.key = String(index);
       };
 
-      var compileTemplate = requireModule('glimmer-compiler/index').compile,
-          DemoEnvironment = requireModule('glimmer-demos/index').TestEnvironment;
-
+      var DemoEnvironment = requireModule('glimmer-demos').TestEnvironment;
       var env = new DemoEnvironment();
 
       TEMPLATES = {};
@@ -111,10 +109,8 @@
         var name   = node.getAttribute("data-template-name"),
             source = node.textContent;
 
-        TEMPLATES[name] = compileTemplate(source, { env: env });
+        TEMPLATES[name] = env.compile(source);
       });
-
-
 
       env.registerHelper('if', function(params, hash, blocks) {
         if (!!params[0]) {
