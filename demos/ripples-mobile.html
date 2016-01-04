@@ -151,7 +151,7 @@
 
       mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
-      mc.on("tap press pan", function(e) {
+      mc.on("swipe pan panstart panmove panend press pressup tap doubletap", function(e) {
         data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
       });
 
