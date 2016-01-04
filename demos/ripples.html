@@ -49,6 +49,11 @@
 
     <div id="output"></div>
 
+    <script>
+      /* globals requireModule, window, loader*/
+      /* jshint -W069 */
+    </script>
+
     <script src="../assets/loader.js"></script>
     <script>loader.noConflict({ define: 'enifed' });</script>
     <script src="../amd/glimmer-compiler.amd.js"></script>
@@ -90,7 +95,7 @@
         this.y = y;
         this.size = 0.0;
         this.opacity = 1.0;
-      };
+      }
 
       Point.prototype.update = function(index, currentTimestamp) {
         var delta = currentTimestamp - this.timestamp;
@@ -103,7 +108,7 @@
       var DemoEnvironment = requireModule('glimmer-demos').TestEnvironment;
       var env = new DemoEnvironment();
 
-      TEMPLATES = {};
+      var TEMPLATES = {};
 
       Array.prototype.slice.call(document.querySelectorAll("[data-template-name]")).forEach(function(node) {
         var name   = node.getAttribute("data-template-name"),
@@ -144,7 +149,7 @@
       var timestamp  = window.performance.now();
 
       function tick() {
-        var _timestamp = window.performance.now()
+        var _timestamp = window.performance.now();
 
         var delta = _timestamp - timestamp;
 

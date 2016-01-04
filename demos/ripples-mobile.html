@@ -49,6 +49,10 @@
 
     <div id="output"></div>
 
+    <script>
+      /* globals requireModule, window, loader, Hammer */
+      /* jshint -W069, -W064 */
+    </script>
     <script src="../assets/hammer.min.js"></script>
     <script src="../assets/loader.js"></script>
     <script>loader.noConflict({ define: 'enifed' });</script>
@@ -56,7 +60,6 @@
     <script src="./demos.amd.js"></script>
 
     <script>
-
       function RingBuffer(capacity) {
         this.capacity = capacity;
         this.head     = 0;
@@ -92,7 +95,7 @@
         this.y = y;
         this.size = 0.0;
         this.opacity = 1.0;
-      };
+      }
 
       Point.prototype.update = function(index, currentTimestamp) {
         var delta = currentTimestamp - this.timestamp;
@@ -102,18 +105,17 @@
         this.key = String(index);
       };
 
-      var compileTemplate = requireModule('glimmer-compiler/index').compile,
-          DemoEnvironment = requireModule('glimmer-demos/index').TestEnvironment;
 
+      var DemoEnvironment = requireModule('glimmer-demos').TestEnvironment;
       var env = new DemoEnvironment();
 
-      TEMPLATES = {};
+      var TEMPLATES = {};
 
       Array.prototype.slice.call(document.querySelectorAll("[data-template-name]")).forEach(function(node) {
         var name   = node.getAttribute("data-template-name"),
             source = node.textContent;
 
-        TEMPLATES[name] = compileTemplate(source, { env: env });
+        TEMPLATES[name] = env.compile(source);
       });
 
       env.registerHelper('if', function(params, hash, blocks) {
@@ -159,7 +161,7 @@
       var timestamp  = window.performance.now();
 
       function tick() {
-        var _timestamp = window.performance.now()
+        var _timestamp = window.performance.now();
 
         var delta = _timestamp - timestamp;
 
