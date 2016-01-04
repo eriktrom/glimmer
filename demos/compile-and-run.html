@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Glimmer example</title>
@@ -149,6 +150,13 @@
     </style>
   </head>
   <body>
+    <div>
+      <a href="./compile-and-run.html">Compile &amp; Run</a>
+      <a href="./reference.html">Reference</a>
+      <a href="./ripples.html">Ripples</a>
+      <a href="./ripples-mobile.html">Ripples Mobile</a>
+      <a href="./uptime-boxes.html">Uptime Boxes</a>
+    </div>
     <script type="template" id="pretty-print">
       {{#each templates key="index" as |template|}}
         <h4>Template <span class='template-num'>{{template.index}}</span></h4>
@@ -218,8 +226,8 @@
 
       var escape          = requireModule('handlebars/utils').escapeExpression;
 
-      var compileTemplate = requireModule('glimmer-demos/index').compile,
-          DemoEnvironment = requireModule('glimmer-demos/index').TestEnvironment,
+      var compileTemplate = requireModule('glimmer-compiler/index').compile;
+      var DemoEnvironment = requireModule('glimmer-demos/index').TestEnvironment,
           MyComponent     = requireModule('glimmer-demos/index').MyComponent;
 
       var env = new DemoEnvironment();
@@ -278,8 +286,8 @@
         return value;
       }
 
-      // var layout = compileTemplate('<div color="{{attrs.color}}">{{yield}}</div>');
-      // env.registerComponent('my-component', MyComponent, layout);
+      env.registerComponent('my-component', MyComponent, layout);
+      var layout = env.compile('<div color="{{attrs.color}}">{{yield}}</div>');
 
       var templateSource = localStorage.getItem('templateSource');
       var data = localStorage.getItem('templateData');
@@ -315,17 +323,17 @@
           compileOptions = {};
         }
 
-        var template = compileTemplate(source, compileOptions);
-        var templates = template.prettyPrint();
+        var template = env.compile(source);
+        // var templates = template.prettyPrint();
 
         printed.innerHTML = '';
-        var compiledPrintTemplate = compileTemplate(printTemplate);
+        var compiledPrintTemplate = env.compile(printTemplate);
 
-        templates = templates.map(function(t, i) {
-          return { statements: t, index: i };
-        }).reverse();
+        // templates = templates.map(function(t, i) {
+        //   return { statements: t, index: i };
+        // }).reverse();
 
-        compiledPrintTemplate.render({ templates: templates }, env, { appendTo: printed });
+        // compiledPrintTemplate.render({ templates: templates }, env, { appendTo: printed });
 
         if (shouldRender) {
           output.innerHTML = outputHTML.innerHTML = '';

@@ -7,6 +7,21 @@
         margin: 0;
         padding: 0;
       }
+
+      #nav {
+        font-size: 2em;
+        line-height: 2em;
+        position: absolute;
+        top: 5px;
+        left: 5px;
+      }
+
+      #nav a {
+        text-decoration: none;
+        color: white;
+        margin: 0 10px;
+        cursor: pointer;
+      }
     </style>
 
     <script data-template-name="application" type="text/x-handlebars-template">
@@ -24,9 +39,17 @@
   </head>
   <body>
 
+    <div id="nav">
+      <a href="./compile-and-run.html">Compile &amp; Run</a>
+      <a href="./reference.html">Reference</a>
+      <a href="./ripples.html">Ripples</a>
+      <a href="./ripples-mobile.html">Ripples Mobile</a>
+      <a href="./uptime-boxes.html">Uptime Boxes</a>
+    </div>
+
     <div id="output"></div>
 
-    <script src="./../bower_components/hammerjs/hammer.js"></script>
+    <script src="../assets/hammer.min.js"></script>
     <script src="../assets/loader.js"></script>
     <script>loader.noConflict({ define: 'enifed' });</script>
     <script src="../amd/glimmer-compiler.amd.js"></script>
@@ -79,8 +102,10 @@
         this.key = String(index);
       };
 
-      var compileTemplate = requireModule('glimmer-demos/index').compile,
+      var compileTemplate = requireModule('glimmer-compiler/index').compile,
           DemoEnvironment = requireModule('glimmer-demos/index').TestEnvironment;
+
+      var env = new DemoEnvironment();
 
       TEMPLATES = {};
 
@@ -88,10 +113,8 @@
         var name   = node.getAttribute("data-template-name"),
             source = node.textContent;
 
-        TEMPLATES[name] = compileTemplate(source);
+        TEMPLATES[name] = compileTemplate(source, { env: env });
       });
-
-      var env = new DemoEnvironment();
 
       env.registerHelper('if', function(params, hash, blocks) {
         if (!!params[0]) {
@@ -165,7 +188,6 @@
       }
 
       tick();
-
     </script>
   </body>
 </html>

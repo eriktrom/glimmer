@@ -137,6 +137,12 @@ module.exports = function() {
     destDir: '/assets'
   });
 
+  var hammerjs = find(bower, {
+    srcDir: '/hammerjs',
+    files: [ 'hammer.min.js' ],
+    destDir: '/assets'
+  });
+
   var es6Tree = find(packagesTree, {
     destDir: 'es6'
   });
@@ -147,10 +153,8 @@ module.exports = function() {
     concatenatedCompiler,
     concatenatedRuntime,
     loader,
+    hammerjs,
     testHarness,
     concatenatedTests
   ]);
 }
-
-
-
