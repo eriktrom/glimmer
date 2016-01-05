@@ -99,13 +99,18 @@ function start() {
   env.commit();
   console.timeEnd('rendering');
 
-  clear = setInterval(function() {
-    result.self.update({ servers: servers() });
-    console.time('updating');
-    result.rerender();
-    console.timeEnd('updating');
-  }, 300);
+  result.self.update({ servers: servers() });
+  console.time('updating');
+  result.rerender();
+  console.timeEnd('updating');
 }
+
+function tick() {
+  start();
+  window.requestAnimationFrame(tick);
+}
+
+tick();
 
 function servers() {
   return [
