@@ -41,8 +41,13 @@
           <circle cx="{{point.x}}" cy="{{point.y}}" r="{{point.size}}" stroke-width="1" stroke="lightblue" stroke-opacity="{{point.opacity}}" fill-opacity="0" />
         {{/each}}
 
+        {{#each events key="key" as |event|}}
+          <text fill="#ffffff" font-size="10" font-family="Verdana" x="{{event.x}}" y="{{event.y}}">{{event.name}}</text>
+        {{/each}}
+
         <text fill="#ffffff" font-size="45" font-family="Verdana" x="0" y="{{height}}">{{count}} circles</text>
-        <text fill="#ffffff" font-size="45" font-family="Verdana" x="400" y="{{height}}">{{fps}} fps</text>
+        <text fill="#ffffff" font-size="45" font-family="Verdana" x="300" y="{{height}}">{{fps}} fps</text>
+        <text fill="#ffffff" font-size="45" font-family="Verdana" x="600" y="{{height}}">{{eventsCount}} Gestures</text>
       </svg>
     </script>
   </head>
@@ -56,7 +61,6 @@
       <a href="./uptime-boxes.html">Uptime Boxes</a>
     </div>
 
-    <div id="log"></div>
     <div id="output"></div>
 
     <script>
@@ -149,7 +153,8 @@
         height: window.innerHeight,
         points: new RingBuffer(500), // in practice we only have 100-200 circles on screen
         count:  0,
-        fps:    0
+        fps:    0,
+        events: []
       };
 
       var result = TEMPLATES['application'].render(data, env, { appendTo: output });
@@ -162,15 +167,46 @@
       var touchAction = 'none';
       var el = document.getElementById(touchAction);
 
-      var mc = Hammer(el, {
+      var mc = new Hammer.Manager(el, {
         touchAction: touchAction
       });
 
+      mc.add(new Hammer.Pan({ threshold: 0, pointers: 0 }));
+
+      mc.add(new Hammer.Swipe()).recognizeWith(mc.get('pan'));
+      mc.add(new Hammer.Rotate({ threshold: 0 })).recognizeWith(mc.get('pan'));
+      mc.add(new Hammer.Pinch({ threshold: 0 })).recognizeWith([mc.get('pan'), mc.get('rotate')]);
+
+      mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
+      mc.add(new Hammer.Tap());
+
       mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+      // bad code, very poor, want to see stuff, dont copy me
+      var counter = 0, hCounter = 100, offset = 0;
+      function calcWidth(width) {
+        width *= 10; // 10*length of event name, dont know what spacing we're using
+                     // points are different than pixels, this is a crappy 'guess'
+
+        if (counter === 1) { offset = width; return 0; } // cognitive disonence, counter is incremented
+                                                         // in the mc.on handler, booyah biotch
+
+
+        // when we wrap at window width, set offset to current word length, start over
+        if (offset > data.width-50) {
+          hCounter += 25;
+          offset = width;
+          return 0;
+        }
+
+        var result = offset; // get result, which is the offset *now*
+        offset += width; // increment offset for next iteration
+        return result; // return the goods
+      }
 
       mc.on("swipe panstart panmove press pressup tap doubletap pinch pinchmove rotatestart rotatemove", function(e) {
         data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
-        logEvent(e.type);
+        data.events.push( { key: counter+=1, name: e.type, x: calcWidth(e.type.length), y: hCounter } );
       });
 
       var baseOffset = Date.now() - window.performance.now();
@@ -185,6 +221,7 @@
 
         data.fps   = (1000 / delta).toPrecision(4);
         data.count = 0;
+        data.eventsCount = counter;
 
         var walltime = baseOffset + timestamp;
 
