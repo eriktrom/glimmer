@@ -22,6 +22,14 @@
         margin: 0 10px;
         cursor: pointer;
       }
+
+      #log {
+        position: absolute;
+        padding: 10px;
+        color: white;
+        font-weight: 100;
+        font-size: .8em;
+      }
     </style>
 
     <script data-template-name="application" type="text/x-handlebars-template">
@@ -47,6 +55,7 @@
       <a href="./uptime-boxes.html">Uptime Boxes</a>
     </div>
 
+    <div id="log"></div>
     <div id="output"></div>
 
     <script>
@@ -126,6 +135,11 @@
         }
       });
 
+      var log = document.getElementById("log");
+      function logEvent(str) {
+        log.insertBefore(document.createTextNode(str +"\n"), log.firstChild);
+      }
+
       var output = document.getElementById('output');
       output.innerHTML = null;
 
@@ -153,8 +167,9 @@
 
       mc.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
-      mc.on("swipe pan panstart panmove panend press pressup tap doubletap", function(e) {
+      mc.on("swipe panstart panmove press pressup tap doubletap pinch pinchmove rotatestart rotatemove", function(e) {
         data.points.push( new Point(e.timeStamp, e.center.x, e.center.y) );
+        logEvent(e.type);
       });
 
       var baseOffset = Date.now() - window.performance.now();
